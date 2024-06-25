@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 export const login = async (req, res) => {
     const { username, password } = req.body
     const age = 1000 * 60 * 60 * 24 * 7
-    console.log(req.body)
+    
     try {
         const user = await prisma.user.findUnique({
             where: { username }
