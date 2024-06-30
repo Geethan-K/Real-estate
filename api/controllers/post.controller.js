@@ -14,6 +14,16 @@ export const getPosts = async (req,res) =>{
                         gte:parseInt(query.min) || 0,
                         lte:parseInt(query.max) || 1000000000
                     }
+                },
+                include:{
+                    postDetail:true,
+                   user:{
+                    select:{
+                        id:true,
+                        username:true,
+                        avatar:true
+                    }
+                   } 
                 }
             })
         res.status(200).json(posts)
@@ -32,6 +42,7 @@ export const getPost = async (req,res) =>{
                 postDetail:true,
                 user:{
                     select:{
+                        id:true,
                         username:true,
                         avatar:true
                     }
