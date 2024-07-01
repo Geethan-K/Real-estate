@@ -31,6 +31,28 @@ export const getChats = async (req,res) =>{
     }
 }
 
+export const getChatId = async(req,res) =>{
+    const tokenUserId = req.userId
+    const receiverId = req.params.id
+    try{
+        const chatID = await prisma.chat.findFirst({
+            where:{
+                userIDs:{
+                    hasEvery:[tokenUserId,receiverId]
+                }
+            },
+            select:{
+                id:true
+            }
+        })
+        res.status(200).json(chatID)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({message: "Failed to get chat !"})
+    }
+}
+
+
 export const getChat = async (req,res) =>{
     const tokenUserId = req.userId
     try{
