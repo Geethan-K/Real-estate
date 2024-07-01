@@ -23,7 +23,9 @@ export const getPosts = async (req,res) =>{
                         username:true,
                         avatar:true
                     }
-                   } 
+                   },
+                    ratings:true,
+                    comments:true
                 }
             })
         res.status(200).json(posts)
@@ -46,7 +48,9 @@ export const getPost = async (req,res) =>{
                         username:true,
                         avatar:true
                     }
-                }
+                },
+                ratings:true,
+                comments:true
             }
         })
         let userId;
