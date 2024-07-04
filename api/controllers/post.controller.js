@@ -49,8 +49,35 @@ export const getPost = async (req,res) =>{
                         avatar:true
                     }
                 },
-                ratings:true,
-                comments:true
+                ratings:{
+                    select:{
+                        stars:true,
+                        postId:true,
+                        createdAt:true,
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        }
+                    },
+                    
+                },
+                comments:{
+                    select:{
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        },
+                        content:true,
+                        createdAt:true,
+                        postId:true
+                    }
+                },
             }
         })
         let userId;
