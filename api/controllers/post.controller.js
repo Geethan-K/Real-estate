@@ -36,7 +36,7 @@ export const getPosts = async (req,res) =>{
 }
 export const getPost = async (req,res) =>{
     const id = req.params.id
-   
+    
     try{
         const post = await prisma.post.findUnique({
             where:{id},
@@ -80,6 +80,8 @@ export const getPost = async (req,res) =>{
                 },
             }
         })
+
+      
         let userId;
         const token = req.cookies?.token
         if(!token){
@@ -93,6 +95,27 @@ export const getPost = async (req,res) =>{
                 }
             })
         }
+        const commented = await prisma.post.findUnique({
+            where:{
+                id,
+                comments:{
+                    some:{
+                        userId
+                    }
+                }
+            }
+        })
+        const rated = await prisma.post.findUnique({
+            where:{
+                id,
+                ratings:{
+                    some:{
+                        userId
+                    }
+                }
+            },
+            
+        })
         const saved = await prisma.savedPost.findUnique({
             where:{
                 userId_postId:{
@@ -101,7 +124,7 @@ export const getPost = async (req,res) =>{
                 }
             }
         })
-        res.status(200).json({...post,isSaved:saved ? true:false})
+        res.status(200).json({...post,isSaved:saved ? true:false,alreadyCommented:commented ? true:false,alreadyRated:rated? true:false})
     }catch (err){
         console.log(err);
         res.status(500).json({message:"Failed to get post !"})
