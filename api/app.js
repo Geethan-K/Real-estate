@@ -8,7 +8,7 @@ import usersRoute from './routes/user.route.js'
 import cors from 'cors'
 import  chatsRoute  from './routes/chats.route.js'
 import  messageRoute  from './routes/message.route.js'
-
+import hotel from './routes/hotel.route.js'
 
 const PORT=3000
 
@@ -21,8 +21,10 @@ app.use("/api/auth",authRoute)
 app.use('/api/test',testRoute)
 app.use('/api/users',usersRoute)
 app.use('/api/posts',postsRoute)
+app.use('/api/hotels',hotel)
 app.use('/api/chats',chatsRoute)
 app.use('/api/message',messageRoute)
+
 
 app.listen(PORT,()=>{
     console.log('app listening on port '+PORT)

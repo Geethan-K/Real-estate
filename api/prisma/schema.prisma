@@ -86,6 +86,40 @@ model Message {
   createdAt DateTime @default(now())
 }
 
+model Hotel {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  type String
+  city String
+  address String
+  distance String
+  photos String[]
+  desc String
+  rating Float
+  rooms String[]
+  cheapestPrice Float
+  featured Boolean
+  availRooms roomBooking[]
+}
+
+model roomBooking {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  hotelId String @db.ObjectId
+  hotelBooking Hotel @relation(fields: [hotelId],references:[id])
+  title String
+  price Float
+  maxPeople Int
+  desc String
+  roomNumber Int
+  unavailableDates unavailableDate[]
+}
+model unavailableDate{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  date           DateTime
+  roomBookingId  String @db.ObjectId
+  roomBooking   roomBooking  @relation(fields: [roomBookingId], references: [id])
+}
+
 enum Type{
   buy
   rent
