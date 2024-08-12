@@ -9,6 +9,7 @@ import cors from 'cors'
 import  chatsRoute  from './routes/chats.route.js'
 import  messageRoute  from './routes/message.route.js'
 import hotel from './routes/hotel.route.js'
+import ratingsRoute from './routes/ratings.route.js'
 
 const PORT=3000
 
@@ -23,6 +24,7 @@ app.use('/api/users',usersRoute)
 app.use('/api/posts',postsRoute)
 app.use('/api/hotels',hotel)
 app.use('/api/chats',chatsRoute)
+app.use('/api/commentsAndRatings',ratingsRoute)
 app.use('/api/message',messageRoute)
 
 
