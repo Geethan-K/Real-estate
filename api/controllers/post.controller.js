@@ -9,10 +9,21 @@ export const getPosts = async (req,res) =>{
                     city:query.city || undefined,
                     type:query.type || undefined,
                     property:query.property || undefined,
-                    bedroom:parseInt(query.bedroom) || undefined,
-                    price:{
-                        gte:parseInt(query.min) || 0,
-                        lte:parseInt(query.max) || 1000000000
+                    postDetail:{
+                        BHKType:query.BHKType
+                    },
+                  //  bedroom:parseInt(query.bedroom) || undefined,
+                  price:{
+                    gte:parseInt(query.minPrice) || 0,
+                    lte:parseInt(query.maxPrice) || 1000000000
+                },
+                    rent:{
+                        gte:parseInt(query.minRent) || 0,
+                        lte:parseInt(query.maxRent) || 1000000000
+                    },
+                    deposit:{
+                        gte:parseInt(query.minDeposit) || 0,
+                        lte:parseInt(query.maxDeposit) || 1000000000
                     }
                 },
                 include:{
@@ -28,6 +39,7 @@ export const getPosts = async (req,res) =>{
                     comments:true
                 }
             })
+
         res.status(200).json(posts)
     }catch (err){
         console.log(err);
@@ -184,7 +196,11 @@ export const profilePosts = async (req,res) => {
     const tokenUserId = req.userId
     try{
         const userPosts = await prisma.post.findMany({
-            where:{userId:tokenUserId}
+            where:{userId:tokenUserId},
+            include:{
+                postDetail:true,
+                ratings:true
+            }
         });
         const saved = await prisma.savedPost.findMany({
             where:{userId:tokenUserId} ,

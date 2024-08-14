@@ -51,7 +51,7 @@ model PostDetail {
   BHKType BHK_Type?
   furnishedType FurnishingType?
   PreferredTenants PreferredTenants?
-  availableWithin Availability?
+  availableWithin Availability? 
   post       Post    @relation(fields: [postId], references: [id])
   postId     String  @unique @db.ObjectId
 }
@@ -159,11 +159,9 @@ model unavailableDate{
 enum Type {
   buy
   rent
-  booking
 }
 
 enum Property {
-  any
   apartment
   house
   villa
@@ -171,31 +169,28 @@ enum Property {
   land
 }
 enum FurnishingType {
-  any
-  full
-  semi
-  none
+  full @map("fully furnished")
+  semi  @map("semi furnished")
+  none  @map("not furnished")
 }
 enum PreferredTenants {
-  any
-  family
-  company
-  bachelor_male
-  bachelor_female
+  family @map("families only")
+  company @map("company staffs")
+  bachelor_male @map("bachelor males")
+  bachelor_female @map("bachelor females")
 }
 enum BHK_Type{
-  any
-  ONE_RK
-  ONE_BHK
-  TWO_BHK
-  THREE_BHK
-  FOUR_BHK
-  FOUR_PLUS_BHK
+  ONE_RK @map("1 RK")
+  ONE_BHK @map("1 BHK")
+  TWO_BHK @map("2 BHK")
+  THREE_BHK @map("3 BHK")
+  FOUR_BHK @map("4 BHK")
+  FOUR_PLUS_BHK @map("4+ BHK")
 }
 enum Availability {
-  immediate
-  within_15_days
-  within_30_days
-  after_30_days
+  immediate @map("immediately available")
+  within_15_days @map("within 15 days")
+  within_30_days @map("within 30 days")
+  after_30_days @map("After 30 days")
 }
 
