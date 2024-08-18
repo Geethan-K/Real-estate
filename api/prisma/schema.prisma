@@ -39,31 +39,34 @@ model Post {
 }
 
 model PostDetail {
-  id         String  @id @default(auto()) @map("_id") @db.ObjectId
-  desc       String
-  utilities  String?
-  pet        String?
-  income     String?
-  size       Int?
-  school     Int?
-  bus        Int?
-  restaurant Int?
-  BHKType BHK_Type?
-  furnishedType FurnishingType?
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  desc             String
+  utilities        String?
+  pet              String?
+  income           String?
+  size             Int?
+  school           Int?
+  bus              Int?
+  restaurant       Int?
+  BHKType          BHK_Type?
+  furnishedType    FurnishingType?
   PreferredTenants PreferredTenants?
-  availableWithin Availability?
-  post       Post    @relation(fields: [postId], references: [id])
-  postId     String  @unique @db.ObjectId
+  availableWithin  Availability?
+  post             Post              @relation(fields: [postId], references: [id])
+  postId           String            @unique @db.ObjectId
+  SavedPost        SavedPost?
 }
 
 model SavedPost {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
-//  userId    String   @unique @db.ObjectId
-  userId    String    @db.ObjectId
-  postId    String   @unique @db.ObjectId
-  createdAt DateTime @default(now())
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  user       User       @relation(fields: [userId], references: [id])
+  post       Post       @relation(fields: [postId], references: [id])
+  postDetail PostDetail @relation(fields: [postId], references: [postId])
+ // ratings    Rating     @relation(fields: [postID], references: [postId])
+  //  userId    String   @unique @db.ObjectId
+  userId     String     @db.ObjectId
+  postId     String     @unique @db.ObjectId
+  createdAt  DateTime   @default(now())
 
   @@unique([userId, postId])
 }
@@ -103,13 +106,14 @@ model Message {
 }
 
 model Rating {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
   stars     Float
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.ObjectId
-  createdAt DateTime @default(now())
+  post      Post       @relation(fields: [postId], references: [id])
+  postId    String      @db.ObjectId
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String     @db.ObjectId
+  createdAt DateTime   @default(now())
+  
 }
 
 model Comment {
@@ -123,37 +127,38 @@ model Comment {
 }
 
 model Hotel {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  type String
-  city String
-  address String
-  distance String
-  photos String[]
-  desc String
-  rating Float
-  rooms String[]
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  type          String
+  city          String
+  address       String
+  distance      String
+  photos        String[]
+  desc          String
+  rating        Float
+  rooms         String[]
   cheapestPrice Float
-  featured Boolean
-  availRooms roomBooking[]
+  featured      Boolean
+  availRooms    roomBooking[]
 }
 
 model roomBooking {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  hotelId String @db.ObjectId
-  hotelBooking Hotel @relation(fields: [hotelId],references:[id])
-  title String
-  price Float
-  maxPeople Int
-  desc String
-  roomNumber Int
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  hotelId          String            @db.ObjectId
+  hotelBooking     Hotel             @relation(fields: [hotelId], references: [id])
+  title            String
+  price            Float
+  maxPeople        Int
+  desc             String
+  roomNumber       Int
   unavailableDates unavailableDate[]
 }
-model unavailableDate{
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  date           DateTime
-  roomBookingId  String @db.ObjectId
-  roomBooking   roomBooking  @relation(fields: [roomBookingId], references: [id])
+
+model unavailableDate {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  date          DateTime
+  roomBookingId String      @db.ObjectId
+  roomBooking   roomBooking @relation(fields: [roomBookingId], references: [id])
 }
 
 enum Type {
@@ -170,12 +175,14 @@ enum Property {
   PG
   land
 }
+
 enum FurnishingType {
   any
   full
   semi
   none
 }
+
 enum PreferredTenants {
   any
   family
@@ -183,7 +190,8 @@ enum PreferredTenants {
   bachelor_male
   bachelor_female
 }
-enum BHK_Type{
+
+enum BHK_Type {
   any
   ONE_RK
   ONE_BHK
@@ -192,10 +200,10 @@ enum BHK_Type{
   FOUR_BHK
   FOUR_PLUS_BHK
 }
+
 enum Availability {
   immediate
   within_15_days
   within_30_days
   after_30_days
 }
-

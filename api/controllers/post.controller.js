@@ -204,7 +204,7 @@ export const profilePosts = async (req,res) => {
         });
         const saved = await prisma.savedPost.findMany({
             where:{userId:tokenUserId} ,
-            include:{post:true}
+            include:{post:true,postDetail:true,ratings:true}
         })
        
         const savedPosts = saved.map((item)=>(item.post))
