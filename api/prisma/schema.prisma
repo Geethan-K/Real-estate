@@ -173,6 +173,9 @@ enum Property {
   house
   villa
   PG
+  hotel
+  resort
+  office_space
   land
 }
 
