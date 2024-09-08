@@ -1,16 +1,23 @@
 import prisma from '../lib/prisma.js';
 import jwt from 'jsonwebtoken';
+import {BHKTypeMapping} from '../enum_mappers/enums.js'
 export const getPosts = async (req,res) =>{
-    const query = req.query;
+    var query = req.query;
+    // for(const key in query){
+    //     if(query[key]=='any'){
+    //         delete query[key]
+    //     }
+    // }
+    query = Object.fromEntries(Object.entries(query).filter(([key,value])=>value!=='any'));
     try{
-        const posts = await prisma.post.findMany(
+        var posts = await prisma.post.findMany(
             {
                 where:{
                     city:query.city || undefined,
                     type:query.type || undefined,
                     property:query.property || undefined,
                     postDetail:{
-                        BHKType:query.BHKType
+                        BHKType:query.BHKType 
                     },
                   //  bedroom:parseInt(query.bedroom) || undefined,
                   price:{
@@ -39,7 +46,8 @@ export const getPosts = async (req,res) =>{
                     comments:true
                 }
             })
-
+      
+          console.log(posts)
         res.status(200).json(posts)
     }catch (err){
         console.log(err);
@@ -194,6 +202,7 @@ export const deletePost = async (req,res) =>{
 
 export const profilePosts = async (req,res) => {
     const tokenUserId = req.userId
+    console.log('token userid',tokenUserId)
     try{
         const userPosts = await prisma.post.findMany({
             where:{userId:tokenUserId},
@@ -204,11 +213,26 @@ export const profilePosts = async (req,res) => {
         });
         const saved = await prisma.savedPost.findMany({
             where:{userId:tokenUserId} ,
-            include:{post:true,postDetail:true}
+            include:{post:true,postDetail:true,ratings:true}
         })
-       
+        // saved.map(async (item)=>{
+        //     saved[item] = await prisma.postDetail.findUnique({
+        //         where:{postId:item.postId}
+        //     })
+        //      saved[item].ratings = await prisma.rating.findMany({
+        //         where:{postId:item.postId}
+        //     })
+          
+        // })
         const savedPosts = saved.map((item)=>(item.post))
-       res.status(200).json({userPosts,savedPosts})
+       
+        // const savedPostsDetails = saved.map((item)=>(item.postDetail))
+        // console.log(savedPostsDetails)
+      
+        //  const savedRes = [savedPosts,savedPostsDetails]
+       // console.log(savedRes)
+        res.status(200).json({userPosts,savedPosts,saved})
+      // res.status(200).json({userPosts,savedPosts})
     }catch(err){
         console.log(err);
         res.status(500).json({message:"Failed to get profile posts !"})
