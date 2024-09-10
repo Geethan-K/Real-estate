@@ -43,7 +43,7 @@ model Post {
 
 model PostDetail {
   id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  desc             String
+  desc             String?
   utilities        String?
   pet              String?
   income           String?
@@ -52,7 +52,8 @@ model PostDetail {
   bus              Int?
   restaurant       Int?
   BHKType          BHK_Type?
-  Highlights        Json?
+  highlights        Json?
+  highlightDetails  Json?
   furnishedType    FurnishingType?
   PreferredTenants PreferredTenants?
   availableWithin  Availability?

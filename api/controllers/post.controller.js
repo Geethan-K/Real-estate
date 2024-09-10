@@ -17,7 +17,7 @@ export const getPosts = async (req,res) =>{
                     type:query.type || undefined,
                     property:query.property || undefined,
                     postDetail:{
-                        BHKType:query.BHKType 
+                        BHKType:query.BHKType || undefined
                     },
                   //  bedroom:parseInt(query.bedroom) || undefined,
                   price:{
