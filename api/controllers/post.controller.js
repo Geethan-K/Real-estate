@@ -19,7 +19,8 @@ export const getPosts = async (req,res) =>{
                     postDetail:{
                         BHKType:query.BHKType || undefined
                     },
-                  //  bedroom:parseInt(query.bedroom) || undefined,
+                    bedroom:parseInt(query.bedroom) || undefined,
+                    bathroom:parseInt(query.bathroom) || undefined,
                   price:{
                     gte:parseInt(query.minPrice) || 0,
                     lte:parseInt(query.maxPrice) || 1000000000
@@ -42,12 +43,39 @@ export const getPosts = async (req,res) =>{
                         avatar:true
                     }
                    },
-                    ratings:true,
-                    comments:true
+                   ratings:{
+                    select:{
+                        stars:true,
+                        postId:true,
+                        createdAt:true,
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        }
+                    },
+                    
+                },
+                comments:{
+                    select:{
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        },
+                        content:true,
+                        createdAt:true,
+                        postId:true
+                    }
+                },
                 }
             })
-      
-          console.log(posts)
+            
+        //  console.log(posts)
         res.status(200).json(posts)
     }catch (err){
         console.log(err);
@@ -152,6 +180,7 @@ export const getPost = async (req,res) =>{
 export const addPost = async (req,res) =>{
     const body = req.body
     const tokenUserId = req.userId
+    body.postDetail.amenities = Object.fromEntries(Object.entries(body.postDetail.amenities).filter(([key,value])=>value!==false));
     try{
         const newPost = await prisma.post.create({
             data:{
@@ -208,12 +237,84 @@ export const profilePosts = async (req,res) => {
             where:{userId:tokenUserId},
             include:{
                 postDetail:true,
-                ratings:true
+                user:{
+                    select:{
+                        id:true,
+                        username:true,
+                        avatar:true
+                    }
+                },
+                ratings:{
+                    select:{
+                        stars:true,
+                        postId:true,
+                        createdAt:true,
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        }
+                    },
+                    
+                },
+                comments:{
+                    select:{
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        },
+                        content:true,
+                        createdAt:true,
+                        postId:true
+                    }
+                },
             }
         });
         const saved = await prisma.savedPost.findMany({
             where:{userId:tokenUserId} ,
-            include:{post:true,postDetail:true,ratings:true}
+            include:{post:true,postDetail:true,
+                user:{
+                    select:{
+                        id:true,
+                        username:true,
+                        avatar:true
+                    }
+                },
+                ratings:{
+                    select:{
+                        stars:true,
+                        postId:true,
+                        createdAt:true,
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        }
+                    },
+                    
+                },
+                comments:{
+                    select:{
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        },
+                        content:true,
+                        createdAt:true,
+                        postId:true
+                    }
+                },
+                        }
         })
         // saved.map(async (item)=>{
         //     saved[item] = await prisma.postDetail.findUnique({

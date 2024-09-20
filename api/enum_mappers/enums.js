@@ -6,4 +6,3 @@ export const BHKTypeMapping = {
     FOUR_BHK: "4 BHK",
     FOUR_PLUS_BHK: "4+ BHK"
   };
-  

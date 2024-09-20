@@ -32,7 +32,6 @@ model Post {
   floorNum   String?
   type       Type
   property   Property
-  createdAt  DateTime    @default(now())
   user       User        @relation(fields: [userId], references: [id])
   userId     String      @db.ObjectId
   postDetail PostDetail?
@@ -51,9 +50,13 @@ model PostDetail {
   school           Int?
   bus              Int?
   restaurant       Int?
-  BHKType          BHK_Type?
+  BHKType          String?
   highlights        Json?
   highlightDetails  Json?
+  amenities         Json?
+  furnishings       Json?
+  gatedCommunity  YesOrNo?
+  gasPipeline     YesOrNo?
   furnishedType    FurnishingType?
   PreferredTenants PreferredTenants?
   availableWithin  Availability?
@@ -72,6 +75,7 @@ model SavedPost {
  // ratings    Rating     @relation(fields: [postId], references: [postId])
   //  userId    String   @unique @db.ObjectId
   ratings    Rating[]
+  comments   Comment[]
   userId     String     @db.ObjectId
   postId     String     @unique @db.ObjectId
   createdAt  DateTime   @default(now())
@@ -134,6 +138,7 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id])
   postId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
+  savedPost SavedPost @relation(fields: [postId],references: [postId])
   userId    String   @db.ObjectId
   createdAt DateTime @default(now())
 }
@@ -221,4 +226,8 @@ enum Availability {
   within_15_days
   within_30_days
   after_30_days
+}
+enum YesOrNo {
+  Yes
+  No
 }
