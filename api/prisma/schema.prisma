@@ -13,6 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model LoginInfo {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  user       User?        @relation(fields: [userId], references: [id])
+  userId     String?      @db.ObjectId
+  loginAt    DateTime?  @default(now())
+}
+
 model Post {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   title      String
@@ -96,6 +103,8 @@ model User {
   chatIDs    String[]    @db.ObjectId
   Rating     Rating[]
   Comment    Comment[]
+
+  Login LoginInfo[]
 }
 
 model Chat {
@@ -122,7 +131,7 @@ model Rating {
   stars     Float
   post      Post     @relation(fields: [postId], references: [id])
   postId    String    @db.ObjectId
-  savedPost SavedPost @relation(fields: [postId],references: [postId])
+  savedPost SavedPost? @relation(fields: [postId],references: [id])
   user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.ObjectId
   createdAt DateTime @default(now())
@@ -138,7 +147,7 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id])
   postId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
-  savedPost SavedPost @relation(fields: [postId],references: [postId])
+  savedPost SavedPost? @relation(fields: [postId],references: [id])
   userId    String   @db.ObjectId
   createdAt DateTime @default(now())
 }

@@ -10,6 +10,7 @@ export const getChats = async (req,res) =>{
                 }
             }
         });
+       
         for (const chat of chats){
             const receiverId = chat.userIDs.find((id)=>id!==tokenUserId);
             const receiverDetails = await prisma.user.findUnique({
@@ -21,9 +22,10 @@ export const getChats = async (req,res) =>{
                     username:true,
                     avatar:true
                 }
-            });
+            });   
             chat.receiver = receiverDetails
            }
+           console.log(chats)
         res.status(200).json(chats)
     }catch(err){
         console.log(err)
@@ -45,7 +47,10 @@ export const getChatId = async(req,res) =>{
                 id:true
             }
         })
-        res.status(200).json(chatID)
+        const isReceiverActive = await prisma.loginInfo.findFirst({
+            where:{userId:receiverId}
+        })
+        res.status(200).json({chatID,isReceiverActive})
     }catch(err){
         console.log(err)
         res.status(500).json({message: "Failed to get chat !"})
@@ -81,6 +86,7 @@ export const getChat = async (req,res) =>{
                 }
             }
         })
+        console.log(chatMessage)
         res.status(200).json(chatMessage)
     }catch(err){
         console.log(err)

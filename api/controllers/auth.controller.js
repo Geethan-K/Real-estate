@@ -6,18 +6,32 @@ import jwt from 'jsonwebtoken'
 export const login = async (req, res) => {
     const { username, password } = req.body
     const age = 1000 * 60 * 60 * 24 * 7
-    
+
     try {
         const user = await prisma.user.findUnique({
             where: { username }
         })
+        
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials !' })
         } else {
+            const hasLoginInfo = await prisma.loginInfo.findFirst({
+                where: { userId: user.id }
+            })
+            if (hasLoginInfo) { 
+                await prisma.loginInfo.delete({
+                    where: { id: hasLoginInfo.id }
+                })
+            }
+            const setLoginInfo = await prisma.loginInfo.create({
+                data: {
+                    userId: user.id,           
+                }
+            })
             const isPswdValid = await bcrypt.compare(password, user.password)
             if (!isPswdValid) return res.status(401).json({ message: 'Invalid credentials !' })
-            const token = jwt.sign({ id: user.id,isAdmin:true }, process.env.JWT_SECRET_KEY, { expiresIn: age })
-            const {password:userPassword,...userinfo} = user
+            const token = jwt.sign({ id: user.id, isAdmin: true }, process.env.JWT_SECRET_KEY, { expiresIn: age })
+            const { password: userPassword, ...userinfo } = user
 
             res.cookie("token", token, { httpOnly: true, maxAge: age }).status(200).json(userinfo)
         }
@@ -27,7 +41,14 @@ export const login = async (req, res) => {
     }
 }
 export const logout = (req, res) => {
-    res.clearCookie("token").status(200).json({message:"Logout Successfull !!"})
+    const {userId} = req.body
+    const hasLoginInfo = prisma.loginInfo.findFirst({
+        where: { userId: userId }
+    })
+     prisma.loginInfo.delete({
+        where: { userId: hasLoginInfo.id }
+    })
+    res.clearCookie("token").status(200).json({ message: "Logout Successfull !!" })
 }
 
 export const register = async (req, res) => {
@@ -45,9 +66,9 @@ export const register = async (req, res) => {
                 }
             }
         )
-        res.status(200).json({message:'User created successfully !'})
+        res.status(200).json({ message: 'User created successfully !' })
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'Failed to create user !!!',error:err })
+        res.status(500).json({ message: 'Failed to create user !!!', error: err })
     }
 }
