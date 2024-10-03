@@ -25,7 +25,7 @@ export const getChats = async (req,res) =>{
             });   
             chat.receiver = receiverDetails
            }
-           console.log(chats)
+      //     console.log(chats)
         res.status(200).json(chats)
     }catch(err){
         console.log(err)
@@ -86,7 +86,7 @@ export const getChat = async (req,res) =>{
                 }
             }
         })
-        console.log(chatMessage)
+    //    console.log(chatMessage)
         res.status(200).json(chatMessage)
     }catch(err){
         console.log(err)

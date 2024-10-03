@@ -74,8 +74,6 @@ export const getPosts = async (req,res) =>{
                 },
                 }
             })
-            
-          console.log(posts)
         res.status(200).json(posts)
     }catch (err){
         console.log(err);
@@ -257,7 +255,6 @@ export const profilePosts = async (req,res) => {
                             }
                         }
                     },
-                    
                 },
                 comments:{
                     select:{
@@ -277,14 +274,19 @@ export const profilePosts = async (req,res) => {
         });
         const saved = await prisma.savedPost.findMany({
             where:{userId:tokenUserId} ,
-            include:{post:true,postDetail:true,
-                user:{
-                    select:{
-                        id:true,
-                        username:true,
-                        avatar:true
+            include:{
+                post:{
+                    include:{
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        },
                     }
                 },
+                postDetail:true,
                 ratings:{
                     select:{
                         stars:true,
@@ -298,24 +300,25 @@ export const profilePosts = async (req,res) => {
                             }
                         }
                     },
-                    
                 },
-                comments:{
-                    select:{
-                        user:{
-                            select:{
-                                id:true,
-                                username:true,
-                                avatar:true
+                comments: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                avatar: true
                             }
                         },
-                        content:true,
-                        createdAt:true,
-                        postId:true
+                        content: true,
+                        createdAt: true,
+                        postId: true
                     }
                 },
-                        }
-        })
+            }
+        });
+
+
         // saved.map(async (item)=>{
         //     saved[item] = await prisma.postDetail.findUnique({
         //         where:{postId:item.postId}
@@ -331,7 +334,7 @@ export const profilePosts = async (req,res) => {
         // console.log(savedPostsDetails)
       
         //  const savedRes = [savedPosts,savedPostsDetails]
-       // console.log(savedRes)
+      //  console.log({'saved': saved[0].post.user})
         res.status(200).json({userPosts,savedPosts,saved})
       // res.status(200).json({userPosts,savedPosts})
     }catch(err){
