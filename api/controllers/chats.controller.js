@@ -105,6 +105,17 @@ export const getChat = async (req, res) => {
                 }
             }
         })
+
+        await prisma.message.update({
+            where:{
+                chatId:req.params.id,
+            },
+            data:{
+                seenBy:{
+                    set:[tokenUserId]
+                }
+            }
+        })
         const groupMessagesByDate = (messages) => {
             return messages.reduce((groupedMessages, message) => {
                 
@@ -177,6 +188,16 @@ export const readChat = async (req, res) => {
             data: {
                 seenBy: {
                     set: [tokenUserId]
+                }
+            }
+        })
+        await prisma.message.update({
+            where:{
+                chatId:req.params.id,
+            },
+            data:{
+                seenBy:{
+                    set:[tokenUserId]
                 }
             }
         })
