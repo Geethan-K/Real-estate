@@ -19,7 +19,7 @@ export const addMessage = async (req,res) => {
     const tokenUserId = req.userId
     const text = req.body.text
     const chatId = req.params.id
-  //  console.log({'tokenuser':tokenUserId,'txt-msg':text,'chat-id':chatId})
+    console.log({'tokenuser':tokenUserId,'txt-msg':text,'chat-id':chatId})
     try{
         const chatMsg = await prisma.chat.findUnique({
             where:{
@@ -36,7 +36,10 @@ export const addMessage = async (req,res) => {
             data:{
                 text,
                 chatId,
-                userId:tokenUserId
+                userId:tokenUserId,
+                seenBy:{
+                    set:[tokenUserId]
+                }
             }
         })
         await prisma.chat.update({

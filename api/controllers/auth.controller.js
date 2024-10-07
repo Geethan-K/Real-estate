@@ -19,15 +19,16 @@ export const login = async (req, res) => {
                 where: { userId: user.id }
             })
             if (hasLoginInfo) { 
-                await prisma.loginInfo.delete({
-                    where: { id: hasLoginInfo.id }
+                await prisma.loginInfo.update({
+                    where: { id: hasLoginInfo.id },
+                    data:{loginAt:new Date(),isLive:true}
                 })
             }
-            const setLoginInfo = await prisma.loginInfo.create({
-                data: {
-                    userId: user.id,           
-                }
-            })
+            // const setLoginInfo = await prisma.loginInfo.create({
+            //     data: {
+            //         userId: user.id,           
+            //     }
+            // })
             const isPswdValid = await bcrypt.compare(password, user.password)
             if (!isPswdValid) return res.status(401).json({ message: 'Invalid credentials !' })
             const token = jwt.sign({ id: user.id, isAdmin: true }, process.env.JWT_SECRET_KEY, { expiresIn: age })
@@ -45,8 +46,9 @@ export const logout = (req, res) => {
     const hasLoginInfo = prisma.loginInfo.findFirst({
         where: { userId: userId }
     })
-     prisma.loginInfo.delete({
-        where: { userId: hasLoginInfo.id }
+     prisma.loginInfo.update({
+        where: { userId: hasLoginInfo.id },
+        data:{isLive:false}
     })
     res.clearCookie("token").status(200).json({ message: "Logout Successfull !!" })
 }

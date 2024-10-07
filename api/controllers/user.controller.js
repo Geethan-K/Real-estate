@@ -27,7 +27,7 @@ export const updateUser = async (req, res) => {
     const tokenId = req.userId
     const body = req.body
     const {password,avatar,...inputs} = req.body
-    console.log('password upd',password)
+   
     var updatedPassword = null;
     
     if (id !== tokenId) {
@@ -100,7 +100,7 @@ export const savePost = async(req,res) => {
                     id:savedPost.id,
                 }
             })
-            console.log('post already exist , so going to delete ')
+           
             res.status(200).json({message:"Post removed from saved list"})
         }else{
             await prisma.savedPost.create({
@@ -109,7 +109,6 @@ export const savePost = async(req,res) => {
                 postId
                }
             })
-            console.log('post not exist , so going to save ')
           
             res.status(200).json({message:"Post Saved !"})
         }
