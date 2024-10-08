@@ -122,7 +122,7 @@ model Message {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   text      String
   userId    String
-  seenBy    String[]
+  seenBy    String[] @db.ObjectId
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    String   @db.ObjectId
   createdAt DateTime @default(now())

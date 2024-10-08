@@ -21,13 +21,21 @@ export const getChats = async (req, res) => {
             });
         
             const senderID = chat.userIDs.find((id) => id == msgdUser.userId);
-        
+            const receiverID = chat.userIDs.find((id) => id !== msgdUser.userId)
             // Check if the senderID is the tokenUserId
-            if (senderID == tokenUserId) {
-                // Remove chat if senderID matches tokenUserId
-                chats.splice(i, 1);
-            } else {
+            // if (senderID == tokenUserId) {
+            //     // Remove chat if senderID matches tokenUserId
+            //     chats.splice(i, 1);
+            // } else {
                 // Fetch sender details
+                const receiverDetails = await prisma.user.findUnique({
+                    where:{id:receiverID},
+                    select:{
+                        id: true,
+                        username: true,
+                        avatar: true 
+                    }
+                })
                 const senderDetails = await prisma.user.findUnique({
                     where: {
                         id: senderID
@@ -40,7 +48,7 @@ export const getChats = async (req, res) => {
                 });
                 // Add sender details to chat
                 chat.sender = senderDetails;
-            }
+                chat.receiver = receiverDetails;
         }
        res.status(200).json(chats)
     } catch (err) {
@@ -95,27 +103,29 @@ export const getChat = async (req, res) => {
                 }
             }
         })
-        await prisma.chat.update({
-            where: {
-                id: req.params.id
-            },
-            data: {
-                seenBy: {
-                    set: [tokenUserId]
-                }
-            }
-        })
-
-        await prisma.message.update({
-            where:{
-                chatId:req.params.id,
-            },
-            data:{
-                seenBy:{
-                    set:[tokenUserId]
-                }
-            }
-        })
+        // if (!chatMessage.seenBy.includes(tokenUserId)){
+        //     await prisma.chat.update({
+        //         where: {
+        //             id: req.params.id
+        //         },
+        //         data: {
+        //             seenBy: {
+        //                 set: [...chatMessage.seenBy,tokenUserId]
+        //             }
+        //         }
+        //     })
+        // }
+        
+        // await prisma.message.update({
+        //     where:{
+        //         chatId:req.params.id,
+        //     },
+        //     data:{
+        //         seenBy:{
+        //             set:[tokenUserId]
+        //         }
+        //     }
+        // })
         const groupMessagesByDate = (messages) => {
             return messages.reduce((groupedMessages, message) => {
                 
@@ -178,6 +188,7 @@ export const addChat = async (req, res) => {
 export const readChat = async (req, res) => {
     const tokenUserId = req.userId
     try {
+
         const chat = await prisma.chat.update({
             where: {
                 id: req.params.id,
@@ -191,16 +202,35 @@ export const readChat = async (req, res) => {
                 }
             }
         })
-        await prisma.message.update({
-            where:{
-                chatId:req.params.id,
-            },
-            data:{
-                seenBy:{
-                    set:[tokenUserId]
-                }
-            }
+        const chatMsgs = await prisma.message.findMany({
+            where:{chatId:req.params.id}
         })
+        const lastMessage = chatMsgs[chatMsgs.length-1]
+    
+        
+        if(lastMessage && !lastMessage.seenBy.includes(tokenUserId)){
+             await prisma.message.update({
+                 where:{
+                         id:lastMessage.id,chatId:req.params.id,
+                 },
+                 data:{
+                     seenBy:{
+                         set:[...lastMessage.seenBy,tokenUserId]
+                     }
+                 }
+             })
+        }
+      
+        // await prisma.message.update({
+        //     where:{
+        //         chatId:req.params.id,
+        //     },
+        //     data:{
+        //         seenBy:{
+        //             set:[tokenUserId]
+        //         }
+        //     }
+        // })
         res.status(200).json(chat)
     } catch (err) {
         console.log(err)
