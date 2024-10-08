@@ -187,6 +187,7 @@ export const addChat = async (req, res) => {
 
 export const readChat = async (req, res) => {
     const tokenUserId = req.userId
+   
     try {
 
         const chat = await prisma.chat.update({
@@ -205,21 +206,38 @@ export const readChat = async (req, res) => {
         const chatMsgs = await prisma.message.findMany({
             where:{chatId:req.params.id}
         })
-        const lastMessage = chatMsgs[chatMsgs.length-1]
-    
-        
-        if(lastMessage && !lastMessage.seenBy.includes(tokenUserId)){
-             await prisma.message.update({
-                 where:{
-                         id:lastMessage.id,chatId:req.params.id,
-                 },
-                 data:{
-                     seenBy:{
-                         set:[...lastMessage.seenBy,tokenUserId]
-                     }
-                 }
-             })
+        for(let i=chatMsgs.length-1;i>1;i--){
+            const lastMessage = chatMsgs[i]
+            
+            if(!chatMsgs[i].seenBy.includes(tokenUserId) && chatMsgs[i].seenBy.length<2){
+                await prisma.message.update({
+                    where:{ 
+                            id:lastMessage.id,chatId:req.params.id,
+                    },
+                    data:{
+                        seenBy:{
+                            set:[...lastMessage.seenBy,tokenUserId]
+                        }
+                    }
+                })
+            }else{
+                break;
+            }
+            
         }
+        
+        // if(lastMessage && !lastMessage.seenBy.includes(tokenUserId)){
+        //      await prisma.message.update({
+        //          where:{
+        //                  id:lastMessage.id,chatId:req.params.id,
+        //          },
+        //          data:{
+        //              seenBy:{
+        //                  set:[...lastMessage.seenBy,tokenUserId]
+        //              }
+        //          }
+        //      })
+        // }
       
         // await prisma.message.update({
         //     where:{
