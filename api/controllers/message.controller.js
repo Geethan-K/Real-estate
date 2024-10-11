@@ -75,7 +75,7 @@ export const searchText = async (req, res) => {
     const { keyword } = req.body;
     try {
         let result = [];
-
+        let chatDetail = null;
         // Find users whose username contains the keyword
         const matchingUsers = await prisma.user.findMany({
             where: { username: { contains: keyword, mode: 'insensitive' } }, // Using 'insensitive' for case-insensitive search
@@ -88,8 +88,10 @@ export const searchText = async (req, res) => {
                 const chatExists = await prisma.chat.findFirst({
                     where: {
                         userIDs: { hasEvery: [tokenUserId, user.id] }, // Checking if both user IDs are present in the chat
-                    },
+                    }
                 });
+                user = {...user,chatDetail:chatExists}
+                // chatDetail=chatExists
                 // Only include the user if a chat exists
                 return chatExists ? user : null;
             })

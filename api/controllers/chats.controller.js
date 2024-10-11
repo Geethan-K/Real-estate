@@ -187,9 +187,7 @@ export const addChat = async (req, res) => {
 
 export const readChat = async (req, res) => {
     const tokenUserId = req.userId
-   
     try {
-
         const chat = await prisma.chat.update({
             where: {
                 id: req.params.id,
@@ -208,7 +206,6 @@ export const readChat = async (req, res) => {
         })
         for(let i=chatMsgs.length-1;i>1;i--){
             const lastMessage = chatMsgs[i]
-            
             if(!chatMsgs[i].seenBy.includes(tokenUserId) && chatMsgs[i].seenBy.length<2){
                 await prisma.message.update({
                     where:{ 
