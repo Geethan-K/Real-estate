@@ -229,7 +229,6 @@ export const deletePost = async (req,res) =>{
 
 export const profilePosts = async (req,res) => {
     const tokenUserId = req.userId
-    
     try{
         const userPosts = await prisma.post.findMany({
             where:{userId:tokenUserId},
@@ -300,6 +299,30 @@ export const profilePosts = async (req,res) => {
                             }
                         }
                     },
+                },
+                likes:{
+                    select:{
+                        userId:true,
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        }
+                    }
+                },
+                shares:{
+                    select:{
+                        userId:true,
+                        user:{
+                            select:{
+                                id:true,
+                                username:true,
+                                avatar:true
+                            }
+                        }
+                    }
                 },
                 comments: {
                     select: {
