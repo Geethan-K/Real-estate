@@ -192,7 +192,6 @@ export const addPost = async (req,res) =>{
             console.log(err)
         })
         res.status(200).json(newPost)
-        
     }catch (err){
         console.log(err);
         res.status(500).json({message:"Failed to add post !"})
@@ -229,6 +228,7 @@ export const deletePost = async (req,res) =>{
 
 export const profilePosts = async (req,res) => {
     const tokenUserId = req.userId
+    console.log(tokenUserId)
     try{
         const userPosts = await prisma.post.findMany({
             where:{userId:tokenUserId},
@@ -255,6 +255,19 @@ export const profilePosts = async (req,res) => {
                         }
                     },
                 },
+                likes: {
+                    select: {
+                        postId: true,
+                        userId: true,
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                avatar: true
+                            }
+                        },
+                    }
+                },
                 comments:{
                     select:{
                         user:{
@@ -267,6 +280,19 @@ export const profilePosts = async (req,res) => {
                         content:true,
                         createdAt:true,
                         postId:true
+                    }
+                },
+                shares: {
+                    select: {
+                        postId: true,
+                        userId: true,
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                avatar: true
+                            }
+                        },
                     }
                 },
             }
@@ -340,8 +366,6 @@ export const profilePosts = async (req,res) => {
                 },
             }
         });
-
-
         // saved.map(async (item)=>{
         //     saved[item] = await prisma.postDetail.findUnique({
         //         where:{postId:item.postId}
@@ -358,7 +382,7 @@ export const profilePosts = async (req,res) => {
       
         //  const savedRes = [savedPosts,savedPostsDetails]
       //  console.log({'saved': saved[0].post.user})
-        res.status(200).json({userPosts,savedPosts,saved})
+         res.status(200).json({userPosts,savedPosts,saved})
       // res.status(200).json({userPosts,savedPosts})
     }catch(err){
         console.log(err);

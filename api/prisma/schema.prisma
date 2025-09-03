@@ -14,11 +14,11 @@ datasource db {
 }
 
 model LoginInfo {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  user       User?        @relation(fields: [userId], references: [id])
-  userId     String?      @db.ObjectId
-  loginAt    DateTime?  @default(now())
-  isLive     Boolean?
+  id      String    @id @default(auto()) @map("_id") @db.ObjectId
+  user    User?     @relation(fields: [userId], references: [id])
+  userId  String?   @db.ObjectId
+  loginAt DateTime? @default(now())
+  isLive  Boolean?
 }
 
 model Post {
@@ -45,8 +45,9 @@ model Post {
   postDetail PostDetail?
   savedPosts SavedPost[]
   ratings    Rating[]
+  likes      Like[]
   comments   Comment[]
-  shares     Share[] 
+  shares     Share[]
 
   notification Notification[]
 }
@@ -62,20 +63,19 @@ model PostDetail {
   bus              Int?
   restaurant       Int?
   BHKType          String?
-  highlights        Json?
-  highlightDetails  Json?
-  amenities         Json?
-  furnishings       Json?
-  gatedCommunity  YesOrNo?
-  gasPipeline     YesOrNo?
+  highlights       Json?
+  highlightDetails Json?
+  amenities        Json?
+  furnishings      Json?
+  gatedCommunity   YesOrNo?
+  gasPipeline      YesOrNo?
   furnishedType    FurnishingType?
   PreferredTenants PreferredTenants?
   availableWithin  Availability?
   post             Post              @relation(fields: [postId], references: [id])
   postId           String            @unique @db.ObjectId
-  createdAt   DateTime?  @default(now())
+  createdAt        DateTime?         @default(now())
   SavedPost        SavedPost?
-  
 }
 
 model SavedPost {
@@ -83,10 +83,10 @@ model SavedPost {
   user       User       @relation(fields: [userId], references: [id])
   post       Post       @relation(fields: [postId], references: [id])
   postDetail PostDetail @relation(fields: [postId], references: [postId])
- // ratings    Rating     @relation(fields: [postId], references: [postId])
+  // ratings    Rating     @relation(fields: [postId], references: [postId])
   //  userId    String   @unique @db.ObjectId
-  likes       Like[]
-  shares      Share[]
+  likes      Like[]
+  shares     Share[]
   ratings    Rating[]
   comments   Comment[]
   userId     String     @db.ObjectId
@@ -97,120 +97,124 @@ model SavedPost {
 }
 
 model User {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  username   String      @unique
-  email      String      @unique
-  password   String      @unique
-  avatar     String?
-  post       Post[]
-  savedPosts SavedPost[]
-  chats      Chat[]      @relation(fields: [chatIDs], references: [id])
-  chatIDs    String[]    @db.ObjectId
-  Rating     Rating[]
-  Login     LoginInfo[]
-  newsFeedposts    NewsFeedPost[]
-  tags       Tag[]
-  likes     Like[]  
-  Comment  Comment[]
-  follows   Follow[]  @relation("following") // Users they follow
-  followers Follow[]  @relation("follower")  // Users following them
-  shares    Share[]   // Relation to shares
-  blocks    Block[]   @relation("blocker") // Users they've blocked
-  blockedBy Block[]   @relation("blocked") // Users that blocked them
-  notifications Notification[] 
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  username      String         @unique
+  email         String         @unique
+  password      String         @unique
+  avatar        String?
+  post          Post[]
+  savedPosts    SavedPost[]
+  chats         Chat[]         @relation(fields: [chatIDs], references: [id])
+  chatIDs       String[]       @db.ObjectId
+  Rating        Rating[]
+  Login         LoginInfo[]
+  newsFeedposts NewsFeedPost[]
+  tags          Tag[]
+  likes         Like[]
+  Comment       Comment[]
+  follows       Follow[]       @relation("following") // Users they follow
+  followers     Follow[]       @relation("follower") // Users following them
+  shares        Share[] // Relation to shares
+  blocks        Block[]        @relation("blocker") // Users they've blocked
+  blockedBy     Block[]        @relation("blocked") // Users that blocked them
+  notifications Notification[]
 
   createdAt DateTime  @default(now())
-  updatedAt DateTime?  @updatedAt 
-
- 
+  updatedAt DateTime? @updatedAt
 }
 
 model NewsFeedPost {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  caption    String
-  media      String[]  // Media URLs (stored in S3)
-  user       User      @relation(fields: [userId], references: [id])
-  userId     String    @db.ObjectId
-  likes      Like[]    // Relation to likes
-  comments   Comment[] // Relation to comments
-  tags       Tag[]    
-  shares     Share[]   // Relation to shares
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime?  @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  caption   String
+  media     String[] // Media URLs (stored in S3)
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @db.ObjectId
+  likes     Like[] // Relation to likes
+  comments  Comment[] // Relation to comments
+  tags      Tag[]
+  shares    Share[] // Relation to shares
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 
   notification Notification[]
 }
+
 model Tag {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  newFeedPost           NewsFeedPost   @relation(fields: [newFeedPostId], references: [id], onDelete: Cascade)
-  newFeedPostId         String         @db.ObjectId
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId         String         @db.ObjectId
-  createdAt      DateTime       @default(now())
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  newFeedPost   NewsFeedPost @relation(fields: [newFeedPostId], references: [id], onDelete: Cascade)
+  newFeedPostId String       @db.ObjectId
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String       @db.ObjectId
+  createdAt     DateTime     @default(now())
 }
 
 model Follow {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  follower     User    @relation("follower", fields: [followerId], references: [id])
-  followerId   String  @db.ObjectId
-  following    User   @relation("following", fields: [followingId], references: [id])
-  followingId  String  @db.ObjectId
-  createdAt    DateTime @default(now())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  follower    User     @relation("follower", fields: [followerId], references: [id])
+  followerId  String   @db.ObjectId
+  following   User     @relation("following", fields: [followingId], references: [id])
+  followingId String   @db.ObjectId
+  createdAt   DateTime @default(now())
 }
 
 model Block {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  blocker   User?   @relation("blocker", fields: [blockerId], references: [id])
-  blockerId String  @db.ObjectId
-  blocked   User    @relation("blocked", fields: [blockedId], references: [id])
-  blockedId String  @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  blocker   User?    @relation("blocker", fields: [blockerId], references: [id])
+  blockerId String   @db.ObjectId
+  blocked   User     @relation("blocked", fields: [blockedId], references: [id])
+  blockedId String   @db.ObjectId
   createdAt DateTime @default(now())
 }
 
 model Notification {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.ObjectId
-  type      String   // 'like', 'comment', 'follow', etc.
-  newsFeedPost   NewsFeedPost?    @relation(fields: [newsFeedPostId], references: [id])
-  newsFeedPostId    String?  @db.ObjectId
-  post   Post?    @relation(fields: [postId], references: [id])
-  postId    String?  @db.ObjectId
-  createdAt DateTime @default(now())
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id])
+  userId         String        @db.ObjectId
+  type           String // 'like', 'comment', 'follow', etc.
+  newsFeedPost   NewsFeedPost? @relation(fields: [newsFeedPostId], references: [id])
+  newsFeedPostId String?       @db.ObjectId
+  post           Post?         @relation(fields: [postId], references: [id])
+  postId         String?       @db.ObjectId
+  createdAt      DateTime      @default(now())
 }
+
 model Like {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  postId  String?  @db.ObjectId
-  user    User?     @relation(fields: [userId], references: [id])
-  userId  String   @db.ObjectId
-  newsFeedPost    NewsFeedPost?     @relation(fields: [newsFeedPostId], references: [id])
-  newsFeedPostId  String?   @db.ObjectId
-  savedPost SavedPost? @relation(fields: [postId],references: [postId])
-  createdAt DateTime @default(now())
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  postId         String?       @db.ObjectId
+  user           User?         @relation(fields: [userId], references: [id])
+  userId         String        @db.ObjectId
+  newsFeedPost   NewsFeedPost? @relation(fields: [newsFeedPostId], references: [id])
+  newsFeedPostId String?       @db.ObjectId
+  savedPost      SavedPost?    @relation(fields: [postId], references: [postId])
+  createdAt      DateTime      @default(now())
+  Post           Post?         @relation(fields: [postId], references: [id])
 }
+
 model Share {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  post    Post     @relation(fields: [postId], references: [id])
-  postId  String   @db.ObjectId
-  newsFeedPost NewsFeedPost @relation(fields: [newFeedPostId], references: [id])
-  newFeedPostId String  @db.ObjectId
-  user    User?     @relation(fields: [userId], references: [id])
-  userId  String   @db.ObjectId
-  savedPost SavedPost? @relation(fields: [postId],references: [postId])
-  createdAt DateTime @default(now())
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  post          Post         @relation(fields: [postId], references: [id])
+  postId        String       @db.ObjectId
+  newsFeedPost  NewsFeedPost @relation(fields: [newFeedPostId], references: [id])
+  newFeedPostId String       @db.ObjectId
+  user          User?        @relation(fields: [userId], references: [id])
+  userId        String       @db.ObjectId
+  savedPost     SavedPost?   @relation(fields: [postId], references: [postId])
+  createdAt     DateTime     @default(now())
 }
+
 model Comment {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String   @db.ObjectId
-  newsFeedPost NewsFeedPost @relation(fields: [newsFeedPostId],references: [id])
-  newsFeedPostId  String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  savedPost SavedPost? @relation(fields: [postId],references: [postId])
-  userId    String   @db.ObjectId
-  createdAt DateTime @default(now())
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  content        String
+  post           Post         @relation(fields: [postId], references: [id])
+  postId         String       @db.ObjectId
+  newsFeedPost   NewsFeedPost @relation(fields: [newsFeedPostId], references: [id])
+  newsFeedPostId String       @db.ObjectId
+  user           User         @relation(fields: [userId], references: [id])
+  savedPost      SavedPost?   @relation(fields: [postId], references: [postId])
+  userId         String       @db.ObjectId
+  createdAt      DateTime     @default(now())
 }
+
 model Chat {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   users       User[]    @relation(fields: [userIDs], references: [id])
@@ -232,18 +236,18 @@ model Message {
 }
 
 model Rating {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
   stars     Float
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String    @db.ObjectId
-  savedPost SavedPost? @relation(fields: [postId],references: [postId])
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.ObjectId
-  createdAt DateTime @default(now())
+  post      Post       @relation(fields: [postId], references: [id])
+  postId    String     @db.ObjectId
+  savedPost SavedPost? @relation(fields: [postId], references: [postId])
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String     @db.ObjectId
+  createdAt DateTime   @default(now())
 
- // SavedPost SavedPost?
+  // SavedPost SavedPost?
 
- // SavedPost SavedPost[]
+  // SavedPost SavedPost[]
 }
 
 model Hotel {
@@ -330,6 +334,7 @@ enum Availability {
   within_30_days
   after_30_days
 }
+
 enum YesOrNo {
   Yes
   No
